@@ -1,0 +1,14 @@
+{
+  "domain": "cfa_fire_forecast",
+  "name": "CFA Fire Danger Forecast",
+  "after_dependencies": ["http", "lovelace"],
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/customwebsite/ha-cfa-fire-forecast",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/customwebsite/ha-cfa-fire-forecast/issues",
+  "requirements": [],
+  "version": "1.1.0"
+}
