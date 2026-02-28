@@ -2,13 +2,13 @@
   "domain": "cfa_fire_forecast",
   "name": "CFA Fire Danger Forecast",
   "after_dependencies": ["http", "lovelace"],
-  "codeowners": [],
+  "codeowners": ["@customwebsite"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/customwebsite/ha-cfa-fire-forecast",
+  "documentation": "https://github.com/customwebsite/homeassistant-4-day-forecast",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/customwebsite/ha-cfa-fire-forecast/issues",
+  "issue_tracker": "https://github.com/customwebsite/homeassistant-4-day-forecast/issues",
   "requirements": [],
-  "version": "1.1.0"
+  "version": "1.2.0"
 }

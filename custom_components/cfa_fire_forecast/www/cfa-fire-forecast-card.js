@@ -328,7 +328,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c CFA-FIRE-FORECAST %c v1.1.0-compact ",
+  "%c CFA-FIRE-FORECAST %c v1.2.0 ",
   "color:#FFF;background:#002855;padding:2px 5px;border-radius:3px 0 0 3px;font-weight:bold",
   "color:#002855;background:#F5A623;padding:2px 5px;border-radius:0 3px 3px 0;font-weight:bold"
 );

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import aiohttp
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -43,7 +44,10 @@ class CfaFireForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Validate connectivity using the combined feed
             session = async_get_clientsession(self.hass)
             try:
-                async with session.get(CFA_COMBINED_RSS_URL, timeout=10) as resp:
+                async with session.get(
+                    CFA_COMBINED_RSS_URL,
+                    timeout=aiohttp.ClientTimeout(total=10),
+                ) as resp:
                     if resp.status != 200:
                         errors["base"] = "cannot_connect"
             except Exception:  # noqa: BLE001
@@ -55,14 +59,12 @@ class CfaFireForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     data={CONF_DISTRICT: district},
                 )
 
-        district_options = {slug: name for slug, name in DISTRICTS.items()}
-
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_DISTRICT, default="central"): vol.In(
-                        district_options
+                        DISTRICTS
                     ),
                 }
             ),

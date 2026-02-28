@@ -7,7 +7,7 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -160,11 +160,6 @@ class CfaFireDangerRatingSensor(CfaBaseSensor):
         )
         self._attr_name = f"Fire Danger Rating {DAY_FRIENDLY[day_index]}"
 
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self.async_write_ha_state()
-
     @property
     def native_value(self) -> str | None:
         """Return the fire danger rating string."""
@@ -219,11 +214,6 @@ class CfaTotalFireBanSensor(CfaBaseSensor):
         )
         self._attr_name = f"Total Fire Ban {DAY_FRIENDLY[day_index]}"
 
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self.async_write_ha_state()
-
     @property
     def native_value(self) -> str | None:
         """Return 'Yes' or 'No' for Total Fire Ban status."""
@@ -266,11 +256,6 @@ class CfaMaxSeveritySensor(CfaBaseSensor):
         self._attr_unique_id = f"cfa_{self._district_slug}_max_severity"
         self._attr_name = "Max Fire Danger Rating"
         self._attr_icon = "mdi:fire"
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self.async_write_ha_state()
 
     @property
     def native_value(self) -> str | None:
@@ -337,11 +322,6 @@ class CfaFeedStatusSensor(CfaBaseSensor):
         super().__init__(coordinator, entry, district_slug)
         self._attr_unique_id = f"cfa_{self._district_slug}_feed_status"
         self._attr_name = "Feed Status"
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self.async_write_ha_state()
 
     @property
     def native_value(self) -> str:
