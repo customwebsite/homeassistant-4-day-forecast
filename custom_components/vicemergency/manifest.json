@@ -1,0 +1,14 @@
+{
+  "domain": "vicemergency",
+  "name": "VicEmergency Incidents",
+  "after_dependencies": ["http", "lovelace"],
+  "codeowners": ["@customwebsite"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/customwebsite/vicemergency-ha",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/customwebsite/vicemergency-ha/issues",
+  "requirements": [],
+  "version": "1.2.0"
+}
