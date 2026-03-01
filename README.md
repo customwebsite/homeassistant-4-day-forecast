@@ -1,9 +1,11 @@
 # CFA Fire Danger Forecast for Home Assistant
 
-[![HACS Compatible](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![HACS Validation](https://github.com/customwebsite/homeassistant-4-day-forecast/actions/workflows/hacs-validate.yml/badge.svg)](https://github.com/customwebsite/homeassistant-4-day-forecast/actions/workflows/hacs-validate.yml)
+[![Hassfest](https://github.com/customwebsite/homeassistant-4-day-forecast/actions/workflows/hassfest.yml/badge.svg)](https://github.com/customwebsite/homeassistant-4-day-forecast/actions/workflows/hassfest.yml)
 
-A Home Assistant custom integration that provides real-time **fire danger ratings** and **Total Fire Ban** status for all CFA (Country Fire Authority) fire districts across Victoria, Australia.
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=customwebsite&repository=homeassistant-4-day-forecast&category=integration)
+
+A Home Assistant custom integration that provides **fire danger ratings** and **Total Fire Ban** status for all CFA (Country Fire Authority) fire districts across Victoria, Australia. Use it to plan your week — know which days carry elevated fire risk so you can prepare your property, adjust travel plans, and schedule outdoor activities accordingly.
 
 Data is sourced from the official [CFA RSS feeds](https://www.cfa.vic.gov.au/rss-feeds), using the AFDRS (Australian Fire Danger Rating System) colour standard.
 
@@ -46,6 +48,7 @@ The number of rating and TFB sensors depends on the **Forecast days** setting (1
 ### Sensor Attributes
 
 **Fire Danger Rating sensors** include:
+
 - `date` — Forecast date label (e.g. "Wednesday, 12 February 2026")
 - `severity` — Numeric severity (0–5)
 - `colour` — AFDRS hex colour for the rating
@@ -54,6 +57,7 @@ The number of rating and TFB sensors depends on the **Forecast days** setting (1
 - `feed_published` — RSS feed publication time
 
 **Max Severity sensor** includes:
+
 - `severity` — Numeric severity of the worst day
 - `colour` — Hex colour for the worst rating
 - `any_total_fire_ban` — True if any day has a TFB
@@ -62,6 +66,7 @@ The number of rating and TFB sensors depends on the **Forecast days** setting (1
 - `feed_source` — `combined` or `individual` (which feed strategy was used)
 
 **Feed Status sensor** (diagnostic) includes:
+
 - `feed_source` — `combined` or `individual`
 - `combined_failures` — Consecutive combined-feed failure count
 - `fallback_active` — True when in sustained fallback mode (3+ consecutive combined failures)
@@ -107,11 +112,48 @@ districts:
 ```
 
 Card options:
+
 - `title` — Card header text (default: "Fire Danger Forecast")
 - `show_title` — Set to `false` to hide the header
 - `districts` — List of districts with `slug` and optional `name`
 
 The card displays a subtle feed health indicator dot in the footer: green (ok), amber (degraded/fallback), or red (failed).
+
+### Dashboard Example — Conditional Fire Danger Card
+
+Show the fire danger card only when the rating is HIGH or above:
+
+```yaml
+type: conditional
+conditions:
+  - entity: sensor.cfa_central_fire_district_max_fire_danger_rating
+    state_not: "NO RATING"
+    state_not: "LOW-MODERATE"
+    state_not: "MODERATE"
+card:
+  type: custom:cfa-fire-forecast-card
+  title: ⚠️ Elevated Fire Danger
+  districts:
+    - slug: central
+      name: Central
+```
+
+### Dashboard Example — TFB Planning Banner
+
+```yaml
+type: conditional
+conditions:
+  - entity: sensor.cfa_central_fire_district_total_fire_ban_tomorrow
+    state: "Yes"
+card:
+  type: markdown
+  content: >
+    ## 🚫 Total Fire Ban Tomorrow
+    A Total Fire Ban has been declared for tomorrow in the Central fire district.
+    Plan accordingly — no fires may be lit in the open. Check
+    [CFA](https://www.cfa.vic.gov.au/warnings-restrictions/total-fire-bans-and-ratings)
+    for details and exemptions.
+```
 
 ## Supported Districts
 
@@ -133,15 +175,17 @@ You can add multiple districts — each creates its own set of sensors. All dist
 
 ### HACS (Recommended)
 
-1. Open HACS in your Home Assistant instance
-2. Click the **three dots** menu → **Custom repositories**
-3. Add the repository URL as an **Integration**
-4. Search for **CFA Fire Danger Forecast** and install it
-5. Restart Home Assistant
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=customwebsite&repository=homeassistant-4-day-forecast&category=integration)
+
+1. Click the badge above, or go to **HACS → Integrations → ⋮ → Custom Repositories**
+2. Add `https://github.com/customwebsite/homeassistant-4-day-forecast` as an **Integration**
+3. Search for "CFA Fire Danger Forecast" and install it
+4. Restart Home Assistant
+5. Go to **Settings → Devices & Services → Add Integration → CFA Fire Danger Forecast**
 
 ### Manual
 
-1. Download the [latest release](../../releases/latest) zip or clone the repository
+1. Download the [latest release](https://github.com/customwebsite/homeassistant-4-day-forecast/releases/latest) zip or clone the repository
 2. Copy the following into your Home Assistant `config/` directory:
 
    ```
@@ -164,7 +208,6 @@ You can add multiple districts — each creates its own set of sensors. All dist
    ```
 
    The `custom_components/cfa_fire_forecast/` folder is required. The `www/` folder at the root is a fallback for the Lovelace card — the integration will attempt to auto-register the card from its own `www/` subfolder, but having it in `config/www/` ensures it works if auto-registration fails.
-
 3. Restart Home Assistant
 4. If the Lovelace card doesn't auto-register, add it manually: **Settings → Dashboards → three dots → Resources → Add Resource** with URL `/local/cfa-fire-forecast-card.js` and type **JavaScript Module**
 
@@ -184,11 +227,11 @@ After adding the integration, click **Configure** on the integration page to adj
 
 ## Automation Examples
 
-### Notify on Extreme or Catastrophic rating
+### Notify on upcoming Extreme or Catastrophic rating
 
 ```yaml
 automation:
-  - alias: "CFA Extreme Fire Danger Alert"
+  - alias: "CFA Extreme Fire Danger Ahead"
     trigger:
       - platform: state
         entity_id: sensor.cfa_central_fire_district_max_fire_danger_rating
@@ -198,14 +241,15 @@ automation:
     action:
       - service: notify.mobile_app_your_phone
         data:
-          title: "🔥 Fire Danger Warning"
+          title: "🔥 Fire Danger Warning — Plan Ahead"
           message: >
             {{ trigger.to_state.state }} fire danger rating forecast for
             {{ state_attr(trigger.entity_id, 'worst_day') }}
             in the Central fire district.
+            Review your fire plan and prepare your property.
 ```
 
-### Notify on Total Fire Ban
+### Notify on Total Fire Ban declared
 
 ```yaml
 automation:
@@ -240,6 +284,33 @@ automation:
             Fire danger ratings may be stale.
 ```
 
+---
+
+## ⚠️ Important Safety Notice
+
+**This integration is a planning tool only.** It provides forecast fire danger ratings to help you prepare for the days ahead — it is not a replacement for official emergency warnings and should never be relied upon as your sole source of fire safety information.
+
+Use this integration to:
+
+- Plan property preparation and maintenance ahead of high-risk days
+- Schedule or reschedule outdoor activities around fire danger forecasts
+- Know when Total Fire Bans are coming so you can adjust plans in advance
+- Build awareness of fire danger trends across the week
+
+During a fire emergency, always:
+
+- Visit the **[CFA website](https://www.cfa.vic.gov.au/warnings-restrictions/total-fire-bans-and-ratings)** for official fire danger ratings and restrictions
+- Visit **[emergency.vic.gov.au](https://emergency.vic.gov.au)** for live incident warnings and updates
+- Tune in to **ABC Melbourne 774 AM** for emergency broadcasts ([listen live online](https://www.abc.net.au/listen/live/melbourne))
+- Call **000** for life-threatening emergencies
+- Call the **VicEmergency Hotline** on **1800 226 226**
+- Monitor the **VicEmergency app** on your mobile device
+- Follow instructions from CFA and emergency services personnel
+
+Data feeds may be delayed, incomplete, or unavailable during major events. Sensor and card states may not reflect the current situation on the ground. Always verify critical information through official channels before making safety decisions.
+
+---
+
 ## Fire Danger Ratings (AFDRS)
 
 | Rating | Severity | Colour | Icon |
@@ -253,17 +324,24 @@ automation:
 
 Colours follow the official Australian Fire Danger Rating System (AFDRS) introduced in September 2022.
 
+---
+
 ## Data Source
 
 Data is fetched from the official CFA RSS feeds:
+
 - **Combined feed** (primary): `https://www.cfa.vic.gov.au/cfa/rssfeed/tfbfdrforecast_rss.xml`
 - **Individual feeds** (fallback): `https://www.cfa.vic.gov.au/cfa/rssfeed/{district}-firedistrict_rss.xml`
 
-## Disclaimer
+### References
 
-This information is for general reference only. Always check the [official CFA website](https://www.cfa.vic.gov.au/warnings-restrictions/total-fire-bans-and-ratings) for the most current fire danger ratings and restrictions.
+- [CFA Total Fire Bans & Ratings](https://www.cfa.vic.gov.au/warnings-restrictions/total-fire-bans-and-ratings) — official fire danger ratings page
+- [CFA RSS Feeds](https://www.cfa.vic.gov.au/rss-feeds) — data feed documentation
+- [Australian Fire Danger Rating System (AFDRS)](https://www.afac.com.au/initiative/afdrs) — national rating system specification
+- [EMV Emergency Data & Licence Terms](https://www.emv.vic.gov.au/responsibilities/victorias-warning-system/emergency-data) — Victorian emergency data usage conditions
+- [Bureau of Meteorology Fire Weather Services](http://www.bom.gov.au/weather-services/fire-weather-centre/index.shtml) — BoM fire weather forecasts for Victoria
 
-**In case of fire emergency, call 000 immediately.**
+---
 
 ## Credits
 
@@ -274,3 +352,5 @@ This information is for general reference only. Always check the [official CFA w
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+Data sourced from the Country Fire Authority, State of Victoria, Australia. CFA data is provided under the [Creative Commons Attribution 3.0 Australia](https://creativecommons.org/licenses/by/3.0/au/) licence.
